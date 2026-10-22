@@ -1,0 +1,6 @@
+{
+  "name": "SkillBridge: AI Micro-Credential Curriculum Platform",
+  "description": "Micro-Credential Curriculum Generation Platform Driven by Real-Time Global Job Market Skill Demands with resume skill extraction, market trends, gap analysis, and personalized roadmaps.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

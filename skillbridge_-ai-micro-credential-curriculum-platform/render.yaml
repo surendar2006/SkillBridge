@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: skillbridge-platform
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm install --legacy-peer-deps && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000

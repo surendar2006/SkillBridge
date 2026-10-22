@@ -1,0 +1,137 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'surendarr.cd23@bitsathy.ac.in') ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Admins collection: strictly managed by verified admins
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) &&
+        incoming().uid == userId &&
+        (incoming().role == 'student' || isAdmin()) &&
+        incoming().email is string && incoming().email.size() <= 256;
+      allow update: if (isOwner(userId) || isAdmin()) &&
+        incoming().uid == userId &&
+        (isAdmin() || incoming().role == existing().role);
+      allow delete: if isAdmin();
+    }
+
+    // Resumes collection
+    match /resumes/{resumeId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() &&
+        incoming().userId == request.auth.uid &&
+        incoming().fileName is string && incoming().fileName.size() <= 255;
+      allow update: if isSignedIn() &&
+        existing().userId == request.auth.uid &&
+        incoming().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Resume Analyses collection
+    match /resumeAnalyses/{analysisId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() &&
+        incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() &&
+        existing().userId == request.auth.uid &&
+        incoming().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Job Postings (Dataset): All authenticated users can read, only Admins can create/update/delete
+    match /jobPostings/{jobId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Skill Trends: All authenticated users can read, only Admins can modify
+    match /skillTrends/{trendId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Learning Resources: All authenticated users can read, only Admins can modify
+    match /learningResources/{resourceId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Skill Gap Reports: Owned by student
+    match /skillGapReports/{reportId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && existing().userId == request.auth.uid && incoming().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Learning Roadmaps: Owned by student
+    match /learningRoadmaps/{roadmapId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && existing().userId == request.auth.uid && incoming().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Learning Progress: Owned by student
+    match /learningProgress/{progressId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && existing().userId == request.auth.uid && incoming().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Saved Items (Jobs & Courses bookmarked by student)
+    match /savedItems/{saveId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && existing().userId == request.auth.uid && incoming().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+  }
+}

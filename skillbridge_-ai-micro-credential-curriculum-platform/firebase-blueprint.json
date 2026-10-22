@@ -1,0 +1,218 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile for student or administrator",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["student", "admin"] },
+        "targetJobRole": { "type": "string", "maxLength": 100 },
+        "education": { "type": "string", "maxLength": 200 },
+        "bio": { "type": "string", "maxLength": 500 },
+        "confirmedSkills": { "type": "array" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "ResumeRecord": {
+      "title": "ResumeRecord",
+      "description": "Metadata for uploaded student resumes",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "fileName": { "type": "string", "maxLength": 255 },
+        "fileType": { "type": "string", "maxLength": 50 },
+        "fileSize": { "type": "number" },
+        "uploadedAt": { "type": "string", "maxLength": 64 },
+        "summary": { "type": "string", "maxLength": 2000 }
+      },
+      "required": ["userId", "fileName", "uploadedAt"]
+    },
+    "ResumeAnalysis": {
+      "title": "ResumeAnalysis",
+      "description": "Extracted and normalized skills and qualifications from student resume",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "extractedSkills": { "type": "array" },
+        "categorizedSkills": { "type": "object" },
+        "experienceYears": { "type": "number" },
+        "educationLevel": { "type": "string", "maxLength": 100 },
+        "projectsIdentified": { "type": "array" },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["userId", "extractedSkills", "updatedAt"]
+    },
+    "JobPosting": {
+      "title": "JobPosting",
+      "description": "Permitted job market listings used for skill demand aggregation",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 150 },
+        "company": { "type": "string", "maxLength": 150 },
+        "location": { "type": "string", "maxLength": 100 },
+        "experienceLevel": { "type": "string", "maxLength": 50 },
+        "requiredSkills": { "type": "array" },
+        "description": { "type": "string", "maxLength": 5000 },
+        "dataSource": { "type": "string", "maxLength": 100 },
+        "sourceUrl": { "type": "string", "maxLength": 500 },
+        "isDemonstration": { "type": "boolean" },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["title", "company", "requiredSkills", "dataSource", "updatedAt"]
+    },
+    "SkillTrendRecord": {
+      "title": "SkillTrendRecord",
+      "description": "Aggregated market demand frequency and metrics for skills",
+      "type": "object",
+      "properties": {
+        "skillName": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "demandFrequency": { "type": "number" },
+        "growthTag": { "type": "string", "maxLength": 50 },
+        "topRoles": { "type": "array" },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["skillName", "category", "demandFrequency", "updatedAt"]
+    },
+    "LearningResource": {
+      "title": "LearningResource",
+      "description": "Recommended courses, certifications, and micro-credentials",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "provider": { "type": "string", "maxLength": 100 },
+        "skillsCovered": { "type": "array" },
+        "difficulty": { "type": "string", "maxLength": 50 },
+        "estimatedDuration": { "type": "string", "maxLength": 50 },
+        "officialUrl": { "type": "string", "maxLength": 500 },
+        "isVerified": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["micro_credential", "course", "certification", "project"] },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["title", "provider", "skillsCovered", "officialUrl", "type"]
+    },
+    "SkillGapReport": {
+      "title": "SkillGapReport",
+      "description": "Student skill gap analysis against a target career role",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "targetRole": { "type": "string", "maxLength": 100 },
+        "matchScore": { "type": "number" },
+        "matchedSkills": { "type": "array" },
+        "missingSkills": { "type": "array" },
+        "prioritizedGaps": { "type": "array" },
+        "explanation": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["userId", "targetRole", "matchScore", "matchedSkills", "missingSkills", "createdAt"]
+    },
+    "LearningRoadmap": {
+      "title": "LearningRoadmap",
+      "description": "Personalized micro-credential curriculum generated for a student",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "targetRole": { "type": "string", "maxLength": 100 },
+        "microCredentialTitle": { "type": "string", "maxLength": 200 },
+        "summary": { "type": "string", "maxLength": 1500 },
+        "estimatedWeeks": { "type": "number" },
+        "modules": { "type": "array" },
+        "capstoneProject": { "type": "object" },
+        "status": { "type": "string", "enum": ["active", "completed", "archived"] },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["userId", "targetRole", "microCredentialTitle", "modules", "createdAt"]
+    },
+    "LearningProgress": {
+      "title": "LearningProgress",
+      "description": "Student progress tracking for modules and skills",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "roadmapId": { "type": "string", "maxLength": 128 },
+        "completedModuleIds": { "type": "array" },
+        "percentComplete": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 2000 },
+        "lastUpdated": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["userId", "roadmapId", "completedModuleIds", "percentComplete", "lastUpdated"]
+    },
+    "SavedItem": {
+      "title": "SavedItem",
+      "description": "Bookmarked job or course item",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "itemId": { "type": "string", "maxLength": 128 },
+        "itemType": { "type": "string", "enum": ["job", "course"] },
+        "itemData": { "type": "object" },
+        "savedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["userId", "itemId", "itemType", "savedAt"]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Document confirming administrative privilege for trusted role checking",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "grantedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with role, skills, target role"
+    },
+    "/resumes/{resumeId}": {
+      "schema": "ResumeRecord",
+      "description": "Uploaded resume metadata records"
+    },
+    "/resumeAnalyses/{analysisId}": {
+      "schema": "ResumeAnalysis",
+      "description": "Parsed and extracted skills from resumes"
+    },
+    "/jobPostings/{jobId}": {
+      "schema": "JobPosting",
+      "description": "Curated or uploaded job market postings"
+    },
+    "/skillTrends/{trendId}": {
+      "schema": "SkillTrendRecord",
+      "description": "Aggregated skill trends across jobs"
+    },
+    "/learningResources/{resourceId}": {
+      "schema": "LearningResource",
+      "description": "Curated micro-credentials and course recommendations"
+    },
+    "/skillGapReports/{reportId}": {
+      "schema": "SkillGapReport",
+      "description": "Skill gap reports generated for students"
+    },
+    "/learningRoadmaps/{roadmapId}": {
+      "schema": "LearningRoadmap",
+      "description": "Generated personalized micro-credential curriculums"
+    },
+    "/learningProgress/{progressId}": {
+      "schema": "LearningProgress",
+      "description": "Progress tracking for modules and curriculums"
+    },
+    "/savedItems/{saveId}": {
+      "schema": "SavedItem",
+      "description": "User bookmarked jobs and courses"
+    },
+    "/admins/{adminId}": {
+      "schema": "AdminRecord",
+      "description": "Authorized administrator registry"
+    }
+  }
+}
